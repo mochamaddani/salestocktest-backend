@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const GetProducts = require('./src/controller/GetProducts');
 const dbConfig = require('./src/db/dbConfig');
-const Products = require('./src/db/schemes/Products');
 
 // Init DB
 dbConfig();
@@ -24,29 +23,8 @@ app.use(function(req, res, next) {
 
 // Route API
 
-app.get('/api/products', function(req, res){
-    const page = parseInt(req.query.page) || 1
-	const limit = parseInt(req.query.perPage) || 2
-	const skip = (page - 1) * limit
-
-    Products.find({}).skip(skip).limit(limit).exec(function(err, product){
-        res.send({
-            message: 'Success',
-            data: product,
-            page: page,
-            perPage: limit,
-        });
-    })
-})
-
-app.get('/api/products/:slug', function(req, res){
-    Products.find({slug: req.params.slug}, function(err, product){
-        res.send({
-            message: 'Success',
-            data: product
-        });
-    })
-})
+app.get('/api/products', GetProducts.All);
+app.get('/api/products/:slug', GetProducts.GetBySlug);
 
 app.listen(PORT, function(){
     console.log(`Server started at port: ${PORT}`);
